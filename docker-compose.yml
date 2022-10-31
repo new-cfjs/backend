@@ -1,0 +1,10 @@
+version: '3.8'
+services:
+  php-apache-environment:
+    container_name: php-apache
+    image: php:apache-pg
+    volumes:
+      - ./php/src:/var/www/html/
+      - ./php/config:/usr/local/etc/php
+    ports:
+      - 8000:80
