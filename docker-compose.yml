@@ -3,8 +3,29 @@ services:
   php-apache-environment:
     container_name: php-apache
     image: php:apache-pg
+    environment:
+      - POSTGRES_HOST=postgis
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=opendata
     volumes:
       - ./php/src:/var/www/html/
       - ./php/config:/usr/local/etc/php
     ports:
       - 8000:80
+  postgis:
+    container_name: postgis
+    hostname: postgis
+    image: postgis/postgis
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=opendata
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    ports:
+      - 5433:5432
+    volumes:
+      - ./data/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./data/fcr_clean.csv:/docker-entrypoint-initdb.d/fcr_clean.csv
+      - ./postgres.conf:/etc/postgresql/postgresql.conf
+      #- ./postgres-data:/var/lib/postgresql/data

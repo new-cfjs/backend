@@ -1,10 +1,8 @@
 <?php
 
     session_start();
-    //echo(phpinfo());
-    $dsn = "pgsql:host=192.168.0.143;port=5432;dbname=opendata;";
     // make a database connection
-    $conn = new PDO("pgsql:host=192.168.0.143;port=5432;dbname=opendata;", "postgres", "postgres", [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+    $conn = new PDO("pgsql:host=postgis;port=5432;dbname=opendata;", "postgres", "postgres", [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
     
     
 
