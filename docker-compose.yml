@@ -9,8 +9,10 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_DB=opendata
     volumes:
-      - ./php/src:/var/www/html/
-      - ./php/config:/usr/local/etc/php
+      - ./web:/var/www/html/
+      - ./php-config:/usr/local/etc/php
+      - ./apache-conf/apache2.conf:/etc/apache2/apache2.conf
+      - ./apache-conf/reverse-proxy.conf:/etc/apache2/conf-enabled/reverse-proxy.conf
     ports:
       - 8000:80
   postgis:
@@ -27,7 +29,7 @@ services:
     volumes:
       - ./data/init.sql:/docker-entrypoint-initdb.d/init.sql
       - ./data/fcr_clean.csv:/docker-entrypoint-initdb.d/fcr_clean.csv
-      - ./postgres.conf:/etc/postgresql/postgresql.conf
+      - ./postgres-conf/postgres.conf:/etc/postgresql/postgresql.conf
       - ./data/large-files:/home/opendata
       #- ./postgres-data:/var/lib/postgresql/data
   pgtileserv:
@@ -36,6 +38,7 @@ services:
     image: pramsey/pg_tileserv:latest
     environment:
       - DATABASE_URL=postgresql://postgres:postgres@postgis/opendata
+      - TS_BASEPATH=/tiles
     ports:
       - 7800:7800
     restart: on-failure # container will fail if database is not ready to accept connections

@@ -45,7 +45,7 @@
 
 <script>
 
-var vectorServer = "http://172.22.65.48:7800/";
+var vectorServer = "/tiles/";
 var vectorSourceLayer = "public.munic_s_intersects";
 var vectorUrl = vectorServer + vectorSourceLayer + "/{z}/{x}/{y}.pbf";
 
@@ -70,7 +70,8 @@ var vectorUrl = vectorServer + vectorSourceLayer + "/{z}/{x}/{y}.pbf";
 var vectorLayer = new ol.layer.VectorTile({
     source: new ol.source.VectorTile({
       format: new ol.format.MVT(),
-      url: vectorUrl
+      url: vectorUrl,
+      crossOrigin: 'anonymous'
     }),
     style: styleFunction
   });
@@ -92,7 +93,7 @@ var vectorLayer = new ol.layer.VectorTile({
 
 var baseLayer = new ol.layer.Tile({
   source: new ol.source.XYZ({
-    url: "https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}.png"
+    url: "https://a.tile.openstreetmap.de/tiles/osmde/{z}/{x}/{y}.png"
   })
 });
 
