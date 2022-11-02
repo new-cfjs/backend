@@ -28,4 +28,23 @@ services:
       - ./data/init.sql:/docker-entrypoint-initdb.d/init.sql
       - ./data/fcr_clean.csv:/docker-entrypoint-initdb.d/fcr_clean.csv
       - ./postgres.conf:/etc/postgresql/postgresql.conf
+      - ./data/large-files:/home/opendata
       #- ./postgres-data:/var/lib/postgresql/data
+  pgtileserv:
+    container_name: pgtileserv
+    hostname: pgtileserv
+    image: pramsey/pg_tileserv:latest
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@postgis/opendata
+    ports:
+      - 7800:7800
+    restart: on-failure # container will fail if database is not ready to accept connections
+  pgadmin:
+    container_name: pgadmin
+    hostname: pgadmin
+    image: dpage/pgadmin4
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=fred.morin@gmail.com
+      - PGADMIN_DEFAULT_PASSWORD=SuperSecretPassword
+    ports:
+      - 8001:80

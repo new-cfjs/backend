@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OpenLayers Vector Tiles</title>
+
+  <!-- CSS/JS for OpenLayers map  -->
+  <link rel="stylesheet" href="https://openlayers.org/en/v6.1.1/css/ol.css" type="text/css">
+  <script src="https://openlayers.org/en/v6.1.1/build/ol.js"></script>
+
+  <style>
+    body {
+      padding: 0;
+      margin: 0;
+    }
+    html, body, #map {
+      height: 100%;
+      width: 100%;
+      font-family: sans-serif;
+    }
+    #meta {
+      background-color: rgba(255,255,255,0.75);
+      color: black;
+      z-index: 2;
+      position: absolute;
+      top: 0px;
+      left: 0px;
+      padding: 10px 20px;
+      margin: 0;
+    }
+  </style>
+</head>
+
+<body>
+
+<div id="meta">
+  <h2>MES GES Analyse</h2>
+  <p id="info">
+    Sélectionner une municipalités de destination afin de visualiser de quel origine les gens proviennent.
+  </p>
+</div>
+
+<div id="map"></div>
+
+<script>
+
+var vectorServer = "http://172.22.65.48:7800/";
+var vectorSourceLayer = "public.munic_s_intersects";
+var vectorUrl = vectorServer + vectorSourceLayer + "/{z}/{x}/{y}.pbf";
+
+  function styleFunction(feature, resolution) {
+    // get the count to display label for the feature properties
+    var count = feature.get('count');
+    return  new ol.style.Style({
+      stroke: new ol.style.Stroke({
+        width: 2,
+        color: "#ff00ff99"
+      }),
+      fill: new ol.style.Fill({
+        color: "#ff00ff33"
+      }),
+      text: new ol.style.Text({
+        color: "#ff00ff33",
+        text: count.toString()
+      })
+    });
+  }
+
+var vectorLayer = new ol.layer.VectorTile({
+    source: new ol.source.VectorTile({
+      format: new ol.format.MVT(),
+      url: vectorUrl
+    }),
+    style: styleFunction
+  });
+  var vectorSourceLayer2 = "public.munic_s";
+  var vectorUrl2 = vectorServer + vectorSourceLayer2 + "/{z}/{x}/{y}.pbf";
+  var vectorLayer2 = new ol.layer.VectorTile({
+    id: 'municipalities',
+    source: new ol.source.VectorTile({
+      format: new ol.format.MVT(),
+      url: vectorUrl2,
+    }),
+    style: new ol.style.Style({
+      stroke: new ol.style.Stroke({
+        width: .5,
+        color: "#00000099"
+      })
+    })
+  });
+
+var baseLayer = new ol.layer.Tile({
+  source: new ol.source.XYZ({
+    url: "https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}.png"
+  })
+});
+
+var map = new ol.Map({
+  target: 'map',
+  view: new ol.View({
+    center: [0, 0],
+    zoom: 2
+  }),
+  layers: [baseLayer, vectorLayer, vectorLayer2]
+});
+
+  map.on('click', function(evt) {
+    //console.info(ol.proj.toLonLat(evt.coordinate));
+    var coords = ol.proj.toLonLat(evt.coordinate);
+    var lat = coords[1];
+    var lon = coords[0];
+    l=map.getLayers().getArray()[1];
+    l.setSource(new ol.source.VectorTile({
+      format: new ol.format.MVT(),
+      url: vectorUrl + "?lon=" + lon + "&lat=" + lat
+    }),);
+    
+  //  const info = document.getElementById('info');
+ //   const feature = map.getFeaturesAtPixel(evt.pixel, 
+  //    {
+ //       layerFilter: function(layerCandidate) {
+  //        return (layerCandidate.get("id") == "municipalities");
+  //      }
+  //    });
+   // const feature = map.forEachFeatureAtPixel(evt.pixel, function (feature) {
+  //    return feature;
+ //   });
+ //   if (feature) {
+ //   info.innerHTML = feature.get('mus_nm_mun') || '&nbsp;';
+ // } else {
+ //  info.innerHTML = '&nbsp;';
+  //}
+  });
+  var selectedStyle = new ol.style.Style({
+          stroke: new ol.style.Stroke({
+          color: '#ff0000',
+          width: 99
+        })
+      });
+  var selectInteraction = new ol.interaction.Select({
+        condition: ol.events.condition.singleClick,
+        toggleCondition: ol.events.condition.shiftKeyOnly,
+        layers: function (layer) {
+          return layer.get('id') == 'municipalities';
+        },
+        style: selectedStyle
+      });
+  map.getInteractions().extend([selectInteraction]);
+</script>
+
+</body>
+</html>
