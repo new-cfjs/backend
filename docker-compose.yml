@@ -15,6 +15,7 @@ services:
       - ./apache-conf/reverse-proxy.conf:/etc/apache2/conf-enabled/reverse-proxy.conf
     ports:
       - 80:80
+    restart: unless-stopped
   postgis:
     container_name: postgis
     hostname: postgis
@@ -32,6 +33,7 @@ services:
       - ./postgres-conf/postgres.conf:/etc/postgresql/postgresql.conf
       - ./data/large-files:/home/opendata
       - ./postgres-data:/var/lib/postgresql/data
+    restart: unless-stopped
   pgtileserv:
     container_name: pgtileserv
     hostname: pgtileserv
@@ -41,7 +43,7 @@ services:
       - TS_BASEPATH=/tiles
     ports:
       - 7800:7800
-    restart: on-failure # container will fail if database is not ready to accept connections
+    restart: unless-stopped # container will fail if database is not ready to accept connections
   pgadmin:
     container_name: pgadmin
     hostname: pgadmin
@@ -51,3 +53,4 @@ services:
       - PGADMIN_DEFAULT_PASSWORD=SuperSecretPassword
     ports:
       - 8001:80
+    restart: unless-stopped
