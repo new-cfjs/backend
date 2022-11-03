@@ -14,7 +14,7 @@ services:
       - ./apache-conf/apache2.conf:/etc/apache2/apache2.conf
       - ./apache-conf/reverse-proxy.conf:/etc/apache2/conf-enabled/reverse-proxy.conf
     ports:
-      - 8000:80
+      - 80:80
   postgis:
     container_name: postgis
     hostname: postgis
@@ -31,7 +31,7 @@ services:
       - ./data/fcr_clean.csv:/docker-entrypoint-initdb.d/fcr_clean.csv
       - ./postgres-conf/postgres.conf:/etc/postgresql/postgresql.conf
       - ./data/large-files:/home/opendata
-      #- ./postgres-data:/var/lib/postgresql/data
+      - ./postgres-data:/var/lib/postgresql/data
   pgtileserv:
     container_name: pgtileserv
     hostname: pgtileserv
